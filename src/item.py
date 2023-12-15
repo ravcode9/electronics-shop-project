@@ -1,34 +1,50 @@
+import os
+import csv
+
 class Item:
-    """
-    Класс для представления товара в магазине.
-    """
     pay_rate = 1.0
     all = []
 
     def __init__(self, name: str, price: float, quantity: int) -> None:
-        """
-        Создание экземпляра класса item.
-
-        :param name: Название товара.
-        :param price: Цена за единицу товара.
-        :param quantity: Количество товара в магазине.
-        """
-        self.name = name
+        self._name = name
         self.price = price
         self.quantity = quantity
-        self.all.append(self)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        self._name = value[:10] if len(value) > 10 else value
 
     def calculate_total_price(self) -> float:
-        """
-        Рассчитывает общую стоимость конкретного товара в магазине.
-
-        :return: Общая стоимость товара.
-        """
         return self.price * self.quantity * self.pay_rate
 
-
     def apply_discount(self) -> None:
-        """
-        Применяет установленную скидку для конкретного товара.
-        """
         self.price *= self.pay_rate
+
+    @classmethod
+    def instantiate_from_csv(cls, filename: str) -> None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, '..', filename)
+
+        # Проверяем существование файла
+        if not os.path.exists(csv_path):
+            raise FileNotFoundError(f"Файл '{filename}' не найден.")
+
+        with open(os.path.join(script_dir, '..', filename), 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                name = row['name']
+                price = float(row['price'])
+                quantity = int(row['quantity'])
+                instance = cls(name, price, quantity)
+                cls.all.append(instance)
+
+    @staticmethod
+    def string_to_number(value: str) -> int:
+        try:
+            return int(float(value))
+        except ValueError:
+            return 0

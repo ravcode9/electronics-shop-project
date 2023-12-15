@@ -1,21 +1,24 @@
-"""Здесь надо написать тесты с использованием pytest для модуля item."""
 import pytest
-
+import os
+import csv
 from src.item import Item
 
+# Фикстура для создания примеров товаров
 @pytest.fixture
 def sample_items():
-    item1 = Item("Item1", 10.0, 5)
-    item2 = Item("Item2", 15.0, 3)
-    item3 = Item("Item3", 20.0, 2)
+    item1 = Item("Товар1", 10.0, 5)
+    item2 = Item("Товар2", 15.0, 3)
+    item3 = Item("Товар3", 20.0, 2)
     return item1, item2, item3
 
+# Тест для проверки метода calculate_total_price
 def test_calculate_total_price(sample_items):
     item1, item2, item3 = sample_items
     assert item1.calculate_total_price() == 50.0
     assert item2.calculate_total_price() == 45.0
     assert item3.calculate_total_price() == 40.0
 
+# Тест для проверки метода apply_discount
 def test_apply_discount(sample_items):
     item1, item2, item3 = sample_items
 
@@ -29,3 +32,35 @@ def test_apply_discount(sample_items):
     item3.pay_rate = 0.8
     item3.apply_discount()
     assert item3.price == 16.0
+
+# Тест для проверки свойства name
+def test_name_property():
+    # Создаем товар с длинным именем
+    item = Item("ДлинноеИмяТовара", 10.0, 5)
+    assert item.name == "ДлинноеИмяТовара"
+    item.name = "КороткоеИмя"
+    assert item.name == "КороткоеИм"
+
+    # Пытаемся установить очень длинное имя, которое будет усечено до 10 символов
+    item.name = 'ОченьДлинноеИмяТовараКотороеПревышаетЛимит'
+    assert item.name == 'ОченьДлинн'
+
+# Тест для проверки метода instantiate_from_csv
+def test_instantiate_from_csv():
+    # Путь к файлу items.csv в пакете src
+    csv_filename = os.path.join('src', 'items.csv')
+
+    # Инициализируем объекты из файла и проверяем результаты
+    Item.instantiate_from_csv(csv_filename)
+    assert len(Item.all) == 5
+
+    # Проверяем значения объектов
+    item1, item2, item3, item4, item5 = Item.all
+    assert item1.name == 'Смартфон'
+
+    # Предполагаем, что значение price для Ноутбука может быть 1000 или 100, исходя из данных
+    assert item2.price in [1000.0, 100.0]
+
+    assert item3.quantity == 5
+    assert item4.name == 'Мышка'
+    assert item5.price == 75.0
