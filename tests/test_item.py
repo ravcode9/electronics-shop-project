@@ -64,3 +64,8 @@ def test_instantiate_from_csv():
     assert item3.quantity == 5
     assert item4.name == 'Мышка'
     assert item5.price == 75.0
+
+def test_item_repr():
+    item = Item("Смартфон", 1200, 5)
+    assert repr(item) == "Item('Смартфон', 1200, 5)"
+    assert str(item) == 'Смартфон'
