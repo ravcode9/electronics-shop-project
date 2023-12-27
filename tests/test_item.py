@@ -69,3 +69,12 @@ def test_item_repr():
     item = Item("Смартфон", 1200, 5)
     assert repr(item) == "Item('Смартфон', 1200, 5)"
     assert str(item) == 'Смартфон'
+
+
+def test_item_instantiate_from_csv():
+    pass
+
+def test_item_string_to_number():
+    assert Item.string_to_number("42") == 42
+    assert Item.string_to_number("3.14") == 3
+    assert Item.string_to_number("invalid") == 0

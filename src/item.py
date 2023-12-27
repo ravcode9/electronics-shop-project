@@ -54,3 +54,9 @@ class Item:
 
     def __str__(self) -> str:
         return self.name
+
+    def __add__(self, other) -> int:
+        if isinstance(other, Item):
+            return self.quantity + other.quantity
+        else:
+            raise TypeError("Нельзя сложить Item с объектами других классов.")
