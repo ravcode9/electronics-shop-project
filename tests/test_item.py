@@ -1,6 +1,5 @@
 import pytest
 import os
-import csv
 from src.item import Item
 
 # Фикстура для создания примеров товаров
@@ -69,10 +68,6 @@ def test_item_repr():
     item = Item("Смартфон", 1200, 5)
     assert repr(item) == "Item('Смартфон', 1200, 5)"
     assert str(item) == 'Смартфон'
-
-
-def test_item_instantiate_from_csv():
-    pass
 
 def test_item_string_to_number():
     assert Item.string_to_number("42") == 42
