@@ -1,6 +1,11 @@
 import os
 import csv
 
+
+class InstantiateCSVError(Exception):
+    pass
+
+
 class Item:
     pay_rate = 1.0
     all = []
@@ -25,22 +30,33 @@ class Item:
         self.price *= self.pay_rate
 
     @classmethod
-    def instantiate_from_csv(cls, filename: str) -> None:
+    def instantiate_from_csv(cls, filename: str = 'item.csv') -> None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, '..', filename)
+        csv_path = os.path.join(script_dir, filename)
 
-        # Проверяем существование файла
-        if not os.path.exists(csv_path):
-            raise FileNotFoundError(f"Файл '{filename}' не найден.")
+        try:
+            with open(csv_path, 'r') as file:
+                reader = csv.DictReader(file)
+                required_columns = {'name', 'price', 'quantity'}
+                if not required_columns.issubset(reader.fieldnames):
+                    raise InstantiateCSVError(f"Файл {filename} поврежден.")
 
-        with open(os.path.join(script_dir, '..', filename), 'r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                name = row['name']
-                price = float(row['price'])
-                quantity = int(row['quantity'])
-                instance = cls(name, price, quantity)
-                cls.all.append(instance)
+                for row in reader:
+                    name = row['name']
+
+                    # Проверяем, что значение в колонке 'price' присутствует и не None
+                    if 'price' not in row or row['price'] is None or row['price'].strip() == '':
+                        raise InstantiateCSVError(f"Отсутствует цена для товара {name}.")
+
+                    price = float(row['price'])
+                    quantity = int(row['quantity'])
+                    instance = cls(name, price, quantity)
+                    cls.all.append(instance)
+
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Отсутствует файл {filename}.")
+        except csv.Error:
+            raise InstantiateCSVError(f"Файл {filename} поврежден.")
 
     @staticmethod
     def string_to_number(value: str) -> int:
@@ -48,6 +64,8 @@ class Item:
             return int(float(value))
         except ValueError:
             return 0
+
+
 
     def __repr__(self) -> str:
         return f"Item('{self.name}', {self.price}, {self.quantity})"

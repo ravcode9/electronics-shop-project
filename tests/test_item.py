@@ -46,8 +46,9 @@ def test_name_property():
 
 # Тест для проверки метода instantiate_from_csv
 def test_instantiate_from_csv():
-    # Путь к файлу items.csv в пакете src
-    csv_filename = os.path.join('src', 'items.csv')
+    # Путь к файлу item.csv в пакете src
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    csv_filename = os.path.join(project_root, 'src', 'item.csv')
 
     # Инициализируем объекты из файла и проверяем результаты
     Item.instantiate_from_csv(csv_filename)
@@ -73,3 +74,5 @@ def test_item_string_to_number():
     assert Item.string_to_number("42") == 42
     assert Item.string_to_number("3.14") == 3
     assert Item.string_to_number("invalid") == 0
+
+
